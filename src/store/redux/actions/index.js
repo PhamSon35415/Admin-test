@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// const url = "http://localhost:4001";
-const url = "https://mg8rp8-8080.csb.app";
+const url = "http://localhost:4001";
+// const url = "https://mg8rp8-8080.csb.app";
 
 const getData = createAsyncThunk(
     "get/data",
