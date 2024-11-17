@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const url = "http://localhost:3000";
+const url = "https://admin-test-weld.vercel.app/api";
 // const url = "https://mg8rp8-8080.csb.app";
 
 const getData = createAsyncThunk(
