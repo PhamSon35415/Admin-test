@@ -48,6 +48,8 @@ function MemberList() {
         dispatch(getData("members"));
     }, [dispatch]);
     const onDelete = (id) => {
+        console.log(id);
+
         dispatch(deleteData({ type: "members", id }));
     };
     const navigate = useNavigate();

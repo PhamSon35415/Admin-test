@@ -1,57 +1,60 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const url = "https://admin-test-weld.vercel.app/api";
-// const url = "https://mg8rp8-8080.csb.app";
+const BASE_URL = "https://mg8rp8-8080.csb.app";
 
-const getData = createAsyncThunk(
-    "get/data",
-    async (type, { rejectWithValue }) => {
+const apiRequest = async (method, endpoint, data = null) => {
+    const response = await axios({
+        method,
+        url: `${BASE_URL}/${endpoint}`,
+        data,
+    });
+    return response.data;
+};
+
+export const getData = createAsyncThunk("data/get", async (type, thunkAPI) => {
+    try {
+        return await apiRequest("get", type);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+});
+
+export const addData = createAsyncThunk(
+    "data/add",
+    async ({ type, data }, thunkAPI) => {
         try {
-            const response = await axios.get(`${url}/${type}`);
-            return response.data;
+            return await apiRequest("post", type, data);
         } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
+            return thunkAPI.rejectWithValue(
+                error.response?.data || error.message
+            );
         }
     }
 );
 
-const addData = createAsyncThunk(
-    "add/data",
-    async ({ type, data }, { rejectWithValue }) => {
+export const deleteData = createAsyncThunk(
+    "data/delete",
+    async ({ type, id }, thunkAPI) => {
         try {
-            const response = await axios.post(`${url}/${type}`, data);
-            return response.data;
+            await apiRequest("delete", `${type}/${id}`);
+            return { id };
         } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
+            return thunkAPI.rejectWithValue(
+                error.response?.data || error.message
+            );
         }
     }
 );
-
-const deleteData = createAsyncThunk(
-    "delete/data",
-    async ({ type, id }, { rejectWithValue }) => {
+export const updateData = createAsyncThunk(
+    "data/update",
+    async ({ type, data }, thunkAPI) => {
         try {
-            console.log(`${url}/${type}/${id}`);
-
-            const response = await axios.delete(`${url}/${type}/${id}`);
-            return response.data;
+            return await apiRequest("put", `${type}/${data.id}`, data);
         } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
+            return thunkAPI.rejectWithValue(
+                error.response?.data || error.message
+            );
         }
     }
 );
-
-const updateData = createAsyncThunk(
-    "update/data",
-    async ({ type, data }, { rejectWithValue }) => {
-        try {
-            const response = await axios.put(`${url}/${type}/${data.id}`, data);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
-        }
-    }
-);
-
-export { getData, deleteData, addData, updateData };

@@ -17,7 +17,7 @@ import {
 import { memo, useState } from "react";
 import PaginationComponent from "../Pagination";
 
-export default memo(function FCommonTable({
+export default function FCommonTable({
     title,
     rows,
     columns,
@@ -192,4 +192,4 @@ export default memo(function FCommonTable({
             />
         </Box>
     );
-});
+}

@@ -1,6 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getData, updateData, deleteData, addData } from "../actions";
 
+// Hàm xử lý chung cho pending, fulfilled, và rejected
+const handleDataState = (builder, thunk, entity) => {
+    builder
+        .addCase(thunk.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(thunk.fulfilled, (state, action) => {
+            state.loading = false;
+            state[entity] = action.payload;
+        })
+        .addCase(thunk.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
+};
+
+// Slice Posts
 const postsSlice = createSlice({
     name: "posts",
     initialState: {
@@ -10,129 +28,57 @@ const postsSlice = createSlice({
     },
     reducers: {},
     extraReducers: (builder) => {
-        builder
-            .addCase(getData.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(getData.fulfilled, (state, action) => {
-                state.loading = false;
-                state.posts = action.payload;
-            })
-            .addCase(getData.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
+        handleDataState(builder, getData, "posts");
 
-            .addCase(addData.pending, (state) => {
-                state.loading = true;
-            })
+        builder
             .addCase(addData.fulfilled, (state, action) => {
-                state.loading = false;
                 state.posts.push(action.payload);
             })
-            .addCase(addData.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            .addCase(updateData.pending, (state) => {
-                state.loading = true;
-            })
             .addCase(updateData.fulfilled, (state, action) => {
-                state.loading = false;
                 const index = state.posts.findIndex(
-                    (product) => product.id === action.payload.id
+                    (post) => post.id === action.payload.id
                 );
                 if (index !== -1) {
-                    state.posts[index] = action.payload.data;
+                    state.posts[index] = action.payload;
                 }
             })
-            .addCase(updateData.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-
-            .addCase(deleteData.pending, (state) => {
-                state.loading = true;
-            })
             .addCase(deleteData.fulfilled, (state, action) => {
-                console.log(action.payload);
-
-                state.loading = false;
                 state.posts = state.posts.filter(
-                    (product) => product.id !== action.payload.id
+                    (post) => post.id !== action.payload.id
                 );
-                console.log(state.posts);
-            })
-            .addCase(deleteData.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
             });
     },
 });
 
-// const categoriesSlice = createSlice({
-//     name: "categories",
-//     initialState: {
-//         categories: [],
-//         loading: false,
-//     },
-//     extraReducers: (builder) => {
-//         builder
-//             .addCase(getData.pending, (state, action) => {
-//                 state.loading = true;
-//             })
-//             .addCase(getData.fulfilled, (state, action) => {
-//                 state.loading = true;
-//                 state.categories = action.payload;
-//             })
-//             .addCase(addData.fulfilled, (state, action) => {
-//                 state.loading = true;
-//                 state.categories.push(action.payload);
-//             })
-//             .addCase(updateData.fulfilled, (state, action) => {
-//                 const index = state.categories.findIndex(
-//                     (product) => product.id === action.payload.id
-//                 );
-//                 if (index !== -1) {
-//                     state.categories[index] = action.payload;
-//                 }
-//             })
-//             .addCase(deleteData.fulfilled, (state, action) => {
-//                 state.categories = state.categories.filter(
-//                     (product) => product.id !== action.payload
-//                 );
-//             });
-//     },
-// });
+// Slice Members
 const membersSlice = createSlice({
     name: "members",
     initialState: {
         members: [],
         loading: false,
+        error: null,
     },
+    reducers: {},
     extraReducers: (builder) => {
+        handleDataState(builder, getData, "members");
+
         builder
-            .addCase(getData.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(getData.fulfilled, (state, action) => {
-                state.loading = false;
-                state.members = action.payload;
-            })
             .addCase(addData.fulfilled, (state, action) => {
                 state.members.push(action.payload);
             })
             .addCase(updateData.fulfilled, (state, action) => {
                 const index = state.members.findIndex(
-                    (user) => user.id === action.payload.id
+                    (member) => member.id === action.payload.id
                 );
                 if (index !== -1) {
                     state.members[index] = action.payload;
                 }
             })
             .addCase(deleteData.fulfilled, (state, action) => {
+                console.log("Payload:", action.payload);
+
                 state.members = state.members.filter(
-                    (user) => user.id !== action.payload.id
+                    (member) => member.id !== action.payload.id
                 );
             });
     },
@@ -140,4 +86,3 @@ const membersSlice = createSlice({
 
 export const postsReducer = postsSlice.reducer;
 export const membersReducer = membersSlice.reducer;
-// export const categoriesReducer = categoriesSlice.reducer;
